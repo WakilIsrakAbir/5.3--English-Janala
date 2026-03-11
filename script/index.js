@@ -7,6 +7,12 @@ const loadLessons = () => {
     })
 };
 
+const removeActive = () => {
+    const lessonButtons = document.querySelectorAll(".lesson-btn");
+    // console.log(lessonButtons);
+    lessonButtons.forEach(btn => btn.classList.remove("active"));
+}
+
 const loadLevelWord = (id) => {
     // console.log(id);
     const url = `https://openapi.programming-hero.com/api/level/${id}`;
@@ -15,8 +21,65 @@ const loadLevelWord = (id) => {
     .then(res => res.json())
     .then(data => {
         // console.log(data);
+        removeActive(); // remove all active class
         displayLevelWord(data.data);
+        const clickBtn = document.getElementById(`lesson-btn-${id}`);
+        // console.log(clickBtn);
+        clickBtn.classList.add("active");
     })
+}
+
+const LoadWordDetail = async (id) => {
+    const url = `https://openapi.programming-hero.com/api/word/${id}`
+    // console.log(url);
+    const res = await fetch(url);
+    const details = await res.json();
+    // console.log(details);
+    displayWordDetails(details.data);
+}
+
+// {
+//     "word": "Grateful",
+//     "meaning": "কৃতজ্ঞ",
+//     "pronunciation": "গ্রেটফুল",
+//     "level": 3,
+//     "sentence": "I am grateful for your help.",
+//     "points": 3,
+//     "partsOfSpeech": "adjective",
+//     "synonyms": [
+//         "thankful",
+//         "appreciative",
+//         "obliged"
+//     ],
+//     "id": 7
+// }
+
+const displayWordDetails = (word) => {
+    console.log(word);
+    const detailsBox = document.getElementById("details-container");
+    detailsBox.innerHTML = `
+    <div class="">
+                    <h2 class="text-2xl font-bold">${word.word} (<i class="fa-solid fa-microphone"></i> : ${word.pronunciation})</h2>
+                </div>
+
+                <div class="">
+                    <h2 class="text-xl font-bold mb-2">Meaning</h2>
+                    <p>${word.meaning}</p>
+                </div>
+
+                <div class="">
+                    <h2 class="text-xl font-bold mb-2">Example</h2>
+                    <p>${word.sentence}</p>
+                </div>
+
+                <div class="">
+                    <h2 class="text-xl font-bold mb-2">সমার্থক শব্দ গুলো</h2>
+                    <span class="btn bg-sky-200">Enthusiastic</span>
+                    <span class="btn bg-sky-200">excited</span>
+                    <span class="btn bg-sky-200">keen</span>
+                </div>
+    `;
+    document.getElementById("word_modal").showModal();
 }
 
 const displayLevelWord = (words) => {
@@ -57,7 +120,7 @@ const displayLevelWord = (words) => {
             <p class="font-semibold">Meaning & Pronounciation</p>
             <div class="text-2xl font-bangla font-medium">"${word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"} | ${word.pronunciation ? word.pronunciation : "উচ্চারণ পাওয়া যায়নি"}"</div>
             <div class="flex justify-between items-center">
-                <button class="btn bg-sky-50 hover:bg-sky-200"><i class="fa-solid fa-circle-info"></i></button>
+                <button onclick = "LoadWordDetail(${word.id})" class="btn bg-sky-50 hover:bg-sky-200"><i class="fa-solid fa-circle-info"></i></button>
                 <button class="btn bg-sky-50 hover:bg-sky-200"><i class="fa-solid fa-volume"></i></button>
             </div>
         </div>
@@ -79,7 +142,7 @@ const displayLesson = (lessons) => {
         // 3. create element
         const btnDiv = document.createElement("div");
         btnDiv.innerHTML = `
-        <button onclick = "loadLevelWord(${lesson.level_no})" class="btn btn-outline btn-primary">
+        <button id="lesson-btn-${lesson.level_no}" onclick = "loadLevelWord(${lesson.level_no})" class="btn btn-outline btn-primary lesson-btn">
             <i class="fa-solid fa-book-open"></i> Lesson - ${lesson.level_no}
         </button>
         `;
