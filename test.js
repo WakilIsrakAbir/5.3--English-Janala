@@ -1,3 +1,5 @@
+// its not connect to any html file just for testing purpus
+
 
 const createElements = (arr) => {
     // console.log(arr);
